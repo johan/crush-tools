@@ -1,8 +1,8 @@
 AC_INIT([crush],
-        [2008-10_trunk],
+        [2009-08_branches_filterkeys],
         [http://code.google.com/p/crush-tools/])
-AM_CONFIG_HEADER(src/libcrush/crush/config.h)
-AC_CONFIG_SRCDIR(src/libcrush/crush/ffutils.h)
+AM_CONFIG_HEADER(src/libcrush/config.h)
+AC_CONFIG_SRCDIR(src/libcrush/ffutils.c)
 AC_CONFIG_AUX_DIR([build])
 AM_INIT_AUTOMAKE
 
@@ -99,6 +99,7 @@ src/findfiles/Makefile
 src/foreach_parallel/Makefile
 src/funiq/Makefile
 src/grepfield/Makefile
+src/hashjoin/Makefile
 src/indexof/Makefile
 src/mergekeys/Makefile
 src/pivot/Makefile
