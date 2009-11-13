@@ -67,7 +67,7 @@ void extract_fields_to_string(char *line, char *destbuf, size_t destbuf_sz,
                               char *suffix);
 void decrement_values(int *array, size_t sz);
 int print_keys_and_agg_vals(char *key, struct aggregation *val);
-int ht_print_keys_and_agg_vals(void *htelem);
+void ht_print_keys_and_agg_vals(void *htelem);
 int key_strcmp(char **a, char **b);
 int float_str_precision(char *d);
 

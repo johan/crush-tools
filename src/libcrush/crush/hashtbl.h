@@ -18,7 +18,7 @@
   * @brief Interface for the hashtbl library.
   *
   * This is a chained hashtable implementation, internally utilizing the
-  * linklist library.  Note that for all key comparisons (in ht_put(), ht_get(),
+  * bstree library.  Note that for all key comparisons (in ht_put(), ht_get(),
   * ht_delete(), etc.) strcmp() is used for comparing the keys.  If support for
   * keys containing null bytes is a requirement, use hashtbl2 instead.
   *
@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 #include <string.h>             /* strcmp(), strlen() */
-#include <crush/linklist.h>
+#include <crush/bstree.h>
 #include <crush/hashfuncs.h>
 #include <crush/mempool.h>
 
@@ -40,7 +40,7 @@
 typedef struct _hashtbl {
   size_t nelems;  /**< number of elements in the hashtable */
   size_t arrsz;   /**< size of the following array */
-  llist_t **arr;  /**< array of linked lists */
+  bstree_t **arr;  /**< array of binary trees */
   /** hash function to use - see hashfuncs.h */
   unsigned int (*hash) (unsigned char *);
   /** memory-freeing function to call against an entry's data */
@@ -106,13 +106,22 @@ void *ht_get(hashtbl_t * tbl, char *key);
   */
 void ht_delete(hashtbl_t * tbl, char *key);
 
+/** @brief populates a list with the keys from the hashtable.
+  *
+  * @param tbl the hashtable
+  * @param array an array to hold the list of keys.  Should be large enough to
+  *              hold tbl->nelems pointers.
+  * @return the number of keys stored in array.
+  */
+int ht_keys(hashtbl_t *tbl, char **array);
+
 /** @brief executes a function for the data in each hashtable entry
   * 
   * @param tbl table to be traversed
   * @param func function to call which takes the entry's data as its
   * only argument.
   */
-void ht_call_for_each(hashtbl_t * tbl, int (*func) (void *));
+void ht_call_for_each(hashtbl_t * tbl, void (*func) (void *));
 
 /** @brief prints some statistics for a hashtable useful for judging
   * hash algorithm performance.

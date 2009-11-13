@@ -133,7 +133,7 @@ int aggregate(struct cmdargs *args, int argc, char *argv[], int optind) {
   int i, n;
 
   hashtbl_t aggregations;
-  llist_t *hash_keys;
+  bstree_t *hash_keys;
 
   size_t n_hash_elems;
 
@@ -386,40 +386,18 @@ int aggregate(struct cmdargs *args, int argc, char *argv[], int optind) {
     }
   }
 
-  /* print all of the output */
-  if (args->nosort) {
-    /* it will be a little faster if the user indicates that
-       the output sort order doesn't matter */
-    for (i = 0; i < aggregations.arrsz; i++) {
-      hash_keys = aggregations.arr[i];
-      if (hash_keys != NULL) {
-        ll_call_for_each(hash_keys, ht_print_keys_and_agg_vals);
-      }
-    }
-  } else {
-    llist_node_t *node;
+  /* Print all of the output. */
+  {
     struct aggregation *val;
     char **key_array;
-    int j = 0;
     key_array = xmalloc(sizeof(char *) * n_hash_elems);
+    ht_keys(&aggregations, key_array);
 
-    /* put all the keys into an array */
-    for (i = 0; i < aggregations.arrsz; i++) {
-      hash_keys = aggregations.arr[i];
-      if (hash_keys != NULL) {
-        for (node = hash_keys->head; node; node = node->next) {
-          key_array[j] = ((ht_elem_t *) node->data)->key;
-          j++;
-        }
-      }
+    if (! args->nosort) {
+      qsort(key_array, n_hash_elems, sizeof(char *),
+            (int (*)(const void *, const void *)) key_strcmp);
     }
 
-    /* sort the keys */
-    qsort(key_array, n_hash_elems, sizeof(char *),
-          (int (*)(const void *, const void *)) key_strcmp);
-    /* (int (*)(const void *, const void *))strcmp ); */
-
-    /* print everything out */
     for (i = 0; i < n_hash_elems; i++) {
       val = (struct aggregation *) ht_get(&aggregations, key_array[i]);
       print_keys_and_agg_vals(key_array[i], val);
@@ -503,12 +481,12 @@ int print_keys_and_agg_vals(char *key, struct aggregation *val) {
   return 0;
 }
 
-int ht_print_keys_and_agg_vals(void *htelem) {
+void ht_print_keys_and_agg_vals(void *htelem) {
   char *key;
   struct aggregation *val;
   key = ((ht_elem_t *) htelem)->key;
   val = ((ht_elem_t *) htelem)->data;
-  return print_keys_and_agg_vals(key, val);
+  print_keys_and_agg_vals(key, val);
 }
 
 void extract_fields_to_string(char *line, char *destbuf, size_t destbuf_sz,
